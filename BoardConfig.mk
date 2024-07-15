@@ -43,9 +43,43 @@ BOARD_MKBOOTIMG_ARGS          += --pagesize $(BOARD_KERNEL_PAGESIZE)
 # Ramdisk use lz4
 BOARD_RAMDISK_USE_LZ4 := true
 
+# A/B
+BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
+BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
+
+AB_OTA_UPDATER := true
+AB_OTA_PARTITIONS += \
+    boot \
+    init_boot \
+    vendor_boot \
+    dtbo \
+    vbmeta \
+    vbmeta_system \
+    odm \
+    product \
+    system \
+    system_ext \
+    system_dlkm \
+    vendor \
+    vendor_dlkm
+
 # Verified Boot
 BOARD_AVB_ENABLE := true
 
+# Partitions
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
+
+# Dynamic Partition
+BOARD_SUPER_PARTITION_SIZE := 16106127360
+BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
+BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 16101933056
+BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := odm product system system_ext vendor vendor_dlkm
+
+BOARD_PARTITION_LIST := $(call to-upper, $(BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST))
+$(foreach p, $(BOARD_PARTITION_LIST), $(eval BOARD_$(p)IMAGE_FILE_SYSTEM_TYPE := erofs))
+$(foreach p, $(BOARD_PARTITION_LIST), $(eval TARGET_COPY_OUT_$(p) := $(call to-lower, $(p))))
+
+BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 
 # File systems
 TARGET_USERIMAGES_USE_EXT4 := true
